@@ -1,0 +1,42 @@
+<html>
+<head>
+  <%= stylesheet_link_tag 'styles' %>
+</head>
+<body>
+<h1>Calcular Data de Vencimento</h1>
+
+<%= form_tag(calculate_due_date_customers_path, method: :post) do %>
+  <div class="field">
+    <%= label_tag 'selected_date', 'Selecione uma data:' %>
+    <%= date_field_tag 'selected_date', @selected_date %>
+  </div>
+  <div class="field">
+    <%= label_tag 'selected_customer_id', 'Selecione um Customer:' %>
+    <%= select_tag 'selected_customer_id', options_for_select(@customer_options, @selected_customer_id) %>
+  </div>
+
+  <%= submit_tag 'Ver data de Vencimento' %>
+<% end %>
+
+<h3>Lista de Customers</h3>
+<table>
+  <thead>
+  <tr>
+    <th>Nome do Cliente</th>
+    <th>Carência</th>
+    <th>Data do Pagamento</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @customers.each do |customer| %>
+    <tr>
+      <td><%= customer.customer_name %></td>
+      <td><%= customer.first_payment_delay %></td>
+      <td><%= customer.payment_day %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
+</body>
+</html>
