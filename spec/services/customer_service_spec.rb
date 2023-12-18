@@ -32,6 +32,14 @@ RSpec.describe CustomerService do
 
         expect(due_date).to eq(expected_due_date)
       end
+
+      it 'returns the preset due date when given the last day of the year' do
+        purchase_date = Date.new(2023, 12, 31)
+        due_date = subject.get_due_date(purchase_date)
+        expected_due_date = Date.new(2024, 1, 12)
+
+        expect(due_date).to eq(expected_due_date)
+      end
     end
 
     context 'when first_payment_delay is nil' do
@@ -49,6 +57,14 @@ RSpec.describe CustomerService do
         purchase_date = Date.new(2023, 12, 10)
         due_date = subject.get_due_date(purchase_date)
         expected_due_date = Date.new(2024, 1, 14)
+
+        expect(due_date).to eq(expected_due_date)
+      end
+
+      it 'returns the not preset due date when given the last day of the year' do
+        purchase_date = Date.new(2023, 12, 31)
+        due_date = subject.get_due_date(purchase_date)
+        expected_due_date = Date.new(2024, 2, 14)
 
         expect(due_date).to eq(expected_due_date)
       end

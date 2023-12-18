@@ -1,4 +1,9 @@
+# frozen_string_literal: true
+
 class CustomerService
+  FIRST_DEFAULT_PAYMENT_DAY = 14.freeze
+  SECOND_DEFAULT_PAYMENT_DAY = 28.freeze
+
   def initialize(customer)
     @customer = customer
   end
@@ -6,35 +11,38 @@ class CustomerService
   def get_due_date(purchase_date)
     @purchase_date = purchase_date
 
-    if @customer.first_payment_delay != nil
+    if customer.first_payment_delay.present?
       prefixed_due_date
     else
       not_prefixed_due_date
     end
   end
 
+  private
+
+  attr_reader :customer, :purchase_date
+
   def prefixed_due_date
-    due_date = @purchase_date + @customer.first_payment_delay.days
+    limit_date = purchase_date + customer.first_payment_delay.days
 
-    if due_date.day <= @customer.payment_day
-      return Date.new(due_date.year,due_date.month,@customer.payment_day)
-    end
+    due_date = limit_date.change(day: customer.payment_day)
 
-    if due_date.month == 12
-      Date.new(due_date.year+1,1,@customer.payment_day)
+    if due_date < limit_date
+      due_date + 1.month
     else
-      Date.new(due_date.year,due_date.month+1,@customer.payment_day)
+      due_date
     end
   end
 
   def not_prefixed_due_date
-    due_date = @purchase_date + 30.days
-    if due_date.day <= 14
-      Date.new(due_date.year,due_date.month,14)
-    elsif due_date.day > 14 && due_date.day <= 28
-      Date.new(due_date.year,due_date.month,28)
+    due_date = purchase_date + 30.days
+
+    if due_date.day <= FIRST_DEFAULT_PAYMENT_DAY
+      due_date.change(day: FIRST_DEFAULT_PAYMENT_DAY)
+    elsif due_date.day > SECOND_DEFAULT_PAYMENT_DAY
+      due_date.change(day: FIRST_DEFAULT_PAYMENT_DAY) + 1.month
     else
-      Date.new(due_date.year,due_date.month+1,14)
+      due_date.change(day: SECOND_DEFAULT_PAYMENT_DAY)
     end
   end
 end
